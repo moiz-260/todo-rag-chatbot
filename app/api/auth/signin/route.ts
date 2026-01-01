@@ -10,7 +10,6 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { email, password } = body;
 
-        // Validate required fields
         if (!email || !password) {
             return NextResponse.json(
                 { error: 'Email and password are required' },
@@ -18,7 +17,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Find user and include password field
         const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
@@ -28,7 +26,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check password
         const isPasswordValid = await user.comparePassword(password);
 
         if (!isPasswordValid) {
@@ -38,14 +35,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Generate JWT token
         const token = jwt.sign(
             { userId: user._id, email: user.email },
             process.env.JWT_SECRET!,
             { expiresIn: '7d' }
         );
 
-        // Return success response
         return NextResponse.json(
             {
                 success: true,

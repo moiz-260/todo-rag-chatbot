@@ -6,14 +6,12 @@ import jwt from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
     try {
-        // Connect to database
         await connectDB();
 
         const body = await request.json();
 
         const { fullName, dateOfBirth, phoneNumber, email, password } = body;
 
-        // Validate required fields
         if (!fullName || !dateOfBirth || !phoneNumber || !email || !password) {
             return NextResponse.json(
                 { error: 'All fields are required' },
@@ -21,7 +19,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Check if user already exists
         const existingUser = await User.findOne({
             $or: [{ email }, { phoneNumber }],
         });
@@ -37,7 +34,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Create new user
         const user = await User.create({
             fullName,
             dateOfBirth,
@@ -46,7 +42,6 @@ export async function POST(request: NextRequest) {
             password,
         });
 
-        // Check if JWT_SECRET exists
         if (!process.env.JWT_SECRET) {
             return NextResponse.json(
                 { error: 'Server configuration error' },
@@ -54,14 +49,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Generate JWT token
         const token = jwt.sign(
             { userId: user._id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: '7d' }
         );
 
-        // Return success response
         return NextResponse.json(
             {
                 success: true,
@@ -78,7 +71,6 @@ export async function POST(request: NextRequest) {
             { status: 201 }
         );
     } catch (error: any) {
-        // Handle mongoose validation errors
         if (error.name === 'ValidationError') {
             return NextResponse.json(
                 { error: 'Validation failed', details: error.errors },
@@ -86,7 +78,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Handle MongoDB connection errors
         if (error.name === 'MongooseServerSelectionError') {
             return NextResponse.json(
                 { error: 'Database connection failed. Please check your MongoDB URI.' },
