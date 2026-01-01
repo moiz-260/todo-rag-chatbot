@@ -50,7 +50,6 @@ const TodoCard: React.FC<TodoCardProps> = ({ todo, isEditing, onEdit, onDelete, 
                 </button>
             </div>
 
-            {/* Editing indicator */}
             {isEditing && (
                 <div className="absolute -top-2 -left-2">
                     <span className="flex h-3 w-3">

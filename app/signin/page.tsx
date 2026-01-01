@@ -1,6 +1,3 @@
-"use client";
-
-import React from "react";
 import AuthLayout from "@/src/components/layout/AuthLayout";
 import GlassCard from "@/src/components/ui/GlassCard";
 import SignInForm from "@/src/components/auth/signin/SignInForm";

@@ -2,22 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/src/lib/mongodb';
 import Todo from '@/src/models/Todo';
 import mongoose from 'mongoose';
-import { upsertTodoToPinecone, deleteTodoFromPinecone } from '@/src/lib/ai';
+// import { upsertTodoToPinecone, deleteTodoFromPinecone } from '@/src/lib/ai';
 
-// PUT - Update a todo
 export async function PUT(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         await dbConnect();
-
-        // Unwrap params (it's a Promise in Next.js 15+ App Router)
         const { id } = await params;
 
         console.log('PUT - Received ID:', id);
 
-        // Validate MongoDB ObjectId format
         if (!mongoose.Types.ObjectId.isValid(id)) {
             console.error('PUT - Invalid ObjectId format:', id);
             return NextResponse.json(
@@ -76,7 +72,6 @@ export async function PUT(
     }
 }
 
-// DELETE - Delete a todo
 export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ id: string }> }
@@ -84,12 +79,9 @@ export async function DELETE(
     try {
         await dbConnect();
 
-        // Unwrap params (it's a Promise in Next.js 15+ App Router)
         const { id } = await params;
 
         console.log('DELETE - Received ID:', id);
-
-        // Validate MongoDB ObjectId format
         if (!mongoose.Types.ObjectId.isValid(id)) {
             console.error('DELETE - Invalid ObjectId format:', id);
             return NextResponse.json(

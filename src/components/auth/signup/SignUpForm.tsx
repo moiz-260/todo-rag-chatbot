@@ -46,7 +46,6 @@ const SignUpForm: React.FC = () => {
     const password = watch('password');
     const confirmPassword = watch('confirmPassword');
 
-    // Update teddy's eye position based on the currently active text field
     useEffect(() => {
         let currentValue: string = '';
         let currentDate: Date = new Date();
@@ -112,7 +111,6 @@ const SignUpForm: React.FC = () => {
                 throw new Error(result.error || 'Sign up failed');
             }
 
-            // Store token in localStorage
             localStorage.setItem('token', result.token);
             localStorage.setItem('user', JSON.stringify(result.user));
 
@@ -120,10 +118,8 @@ const SignUpForm: React.FC = () => {
             riveRef.current?.triggerSuccess();
             toast.success("Your account has been created successfully! Welcome to our family.");
 
-            // Clear form persistence
             localStorage.removeItem('signup-form');
 
-            // Redirect after success message
             setTimeout(() => {
                 router.push('/signin');
             }, 1500);

@@ -38,7 +38,6 @@ const SignInForm: React.FC = () => {
     const email = watch("email");
     const password = watch("password");
 
-    // Update teddy's eye position based on email length
     useEffect(() => {
         if (activeField === "email" && email) {
             riveRef.current?.updateEmailLook(email.length);
@@ -69,7 +68,6 @@ const SignInForm: React.FC = () => {
 
             if (!response.ok) throw new Error(result.error || "Sign in failed");
 
-            // Store token in localStorage and cookies
             localStorage.setItem("token", result.token);
             localStorage.setItem("user", JSON.stringify(result.user));
             localStorage.setItem("email", result.user.email);

@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/src/lib/mongodb';
 import Todo from '@/src/models/Todo';
-import { upsertTodoToPinecone } from '@/src/lib/ai';
+// import { upsertTodoToPinecone } from '@/src/lib/ai';
 
-// GET - Fetch all todos for a user
 export async function GET(request: NextRequest) {
     try {
         await dbConnect();
 
-        // Get userId or email from query params
         const { searchParams } = new URL(request.url);
         const userId = searchParams.get('userId');
         const email = searchParams.get('email');
@@ -32,7 +30,6 @@ export async function GET(request: NextRequest) {
     }
 }
 
-// POST - Create a new todo
 export async function POST(request: NextRequest) {
     try {
         await dbConnect();

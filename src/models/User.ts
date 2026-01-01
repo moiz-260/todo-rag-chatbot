@@ -44,7 +44,7 @@ const UserSchema: Schema = new Schema(
             type: String,
             required: [true, 'Password is required'],
             minlength: 6,
-            select: false, // Don't return password by default
+            select: false,
         },
     },
     {
@@ -52,7 +52,6 @@ const UserSchema: Schema = new Schema(
     }
 );
 
-// Hash password before saving
 UserSchema.pre('save', async function (this: IUser) {
     if (!this.isModified('password')) {
         return;
@@ -66,7 +65,6 @@ UserSchema.pre('save', async function (this: IUser) {
     }
 });
 
-// Method to compare password
 UserSchema.methods.comparePassword = async function (
     candidatePassword: string
 ): Promise<boolean> {

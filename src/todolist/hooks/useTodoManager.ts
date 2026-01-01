@@ -20,7 +20,6 @@ export const useTodoManager = () => {
     });
     const [email, setEmail] = useState<string>('');
 
-    // Toast functions
     const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
         const id = Date.now();
         setToasts(prev => [...prev, { id, message, type }]);
@@ -30,7 +29,6 @@ export const useTodoManager = () => {
         setToasts(prev => prev.filter(toast => toast.id !== id));
     };
 
-    // Get userId and email from cookies or localStorage
     useEffect(() => {
         const userIdFromCookie = Cookies.get('userId');
         const emailFromCookie = Cookies.get('email');
@@ -55,7 +53,6 @@ export const useTodoManager = () => {
         }
     }, []);
 
-    // Fetch todos
     useEffect(() => {
         if (email) {
             fetchTodos();

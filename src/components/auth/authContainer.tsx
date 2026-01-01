@@ -8,7 +8,7 @@ import SignUpForm from "@/src/components/auth/signup/SignUpForm";
 
 
 const AuthContainer = () => {
-  const [isSignIn, setIsSignIn] = useState(true); // default to sign in
+  const [isSignIn, setIsSignIn] = useState(true);
 
   return (
     <div className="relative min-h-screen w-full font-sans overflow-x-hidden">
@@ -28,10 +28,7 @@ const AuthContainer = () => {
         <div className="container max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="flex justify-center lg:justify-start">
-              {/* <GlassCard className="w-full max-w-[650px]">
-                {isSignIn ? <SignInForm /> : <SignUpForm />}
-              </GlassCard> */}
-              <GlassCard className="w-full max-w-md mx-auto"> {/* max-w-md = 28rem = 448px */}
+              <GlassCard className="w-full max-w-md mx-auto">
                 {isSignIn ? <SignInForm /> : <SignUpForm />}
               </GlassCard>
             </div>

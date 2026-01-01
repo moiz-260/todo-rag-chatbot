@@ -5,7 +5,7 @@ interface SuccessMessageProps {
     isVisible: boolean;
     message: string;
     onClose: () => void;
-    autoCloseDuration?: number; // in milliseconds
+    autoCloseDuration?: number;
 }
 
 const SuccessMessage: React.FC<SuccessMessageProps> = ({
@@ -54,7 +54,6 @@ const SuccessMessage: React.FC<SuccessMessageProps> = ({
                     </button>
                 </div>
 
-                {/* Progress bar */}
                 <div className="mt-4 h-1 bg-gray-200 rounded-full overflow-hidden">
                     <div
                         className="h-full bg-green-600 animate-progress"

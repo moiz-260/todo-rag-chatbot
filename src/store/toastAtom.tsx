@@ -10,7 +10,6 @@ export interface Toast {
 
 export const toastsAtom = atom<Toast[]>([]);
 
-// write-only atom to ADD toast
 export const addToastAtom = atom(
     null,
     (get, set, toast: Omit<Toast, "id">) => {
@@ -19,7 +18,6 @@ export const addToastAtom = atom(
     }
 );
 
-// write-only atom to REMOVE toast
 export const removeToastAtom = atom(
     null,
     (get, set, id: number) => {

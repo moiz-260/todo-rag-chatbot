@@ -1,11 +1,11 @@
-"use client"; // Important for Next.js 13+ app directory
+"use client";
 
 import React from "react";
 import { useRive, Layout, Fit, Alignment } from "@rive-app/react-canvas";
 
 const LoadingScreen = () => {
     const { RiveComponent } = useRive({
-        src: "/Loading.riv", // your .riv file path in public folder
+        src: "/Loading.riv",
         autoplay: true,
         layout: new Layout({
             fit: Fit.Contain,

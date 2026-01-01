@@ -35,7 +35,6 @@ const RiveTeddyAnimation = forwardRef<RiveTeddyAnimationRef>((props, ref) => {
     const trigSuccessInput = useStateMachineInput(rive, STATE_MACHINE_NAME, INPUT_Success);
     const trigFailInput = useStateMachineInput(rive, STATE_MACHINE_NAME, INPUT_Fail);
 
-    // Expose methods to parent components
     useImperativeHandle(ref, () => ({
         handleEmailFocus: () => {
             if (isCheckingInput) isCheckingInput.value = true;
