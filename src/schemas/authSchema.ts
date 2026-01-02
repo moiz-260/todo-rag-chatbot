@@ -1,7 +1,10 @@
 import * as yup from 'yup';
+
 const today = new Date();
 const oneYearAgo = new Date();
+
 oneYearAgo.setFullYear(today.getFullYear() - 1);
+
 export const signUpSchema = yup.object().shape({
     fullName: yup
         .string()

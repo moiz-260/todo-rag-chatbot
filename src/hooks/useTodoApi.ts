@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { useApi } from "./useApi";
-import { Todo } from "../todolist/types";
+import { useApi } from "@/src/hooks/useApi";
+import { Todo } from "@/src/todolist/types";
 
 export const useTodoApi = () => {
     const { get, post, put, del, loading, error } = useApi();

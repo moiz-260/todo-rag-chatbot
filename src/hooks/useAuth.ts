@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { useApi } from "./useApi";
-import { SignInFormData, SignUpFormData } from "../types/auth";
-import { useStorage } from "./useStorage";
+import { useApi } from "@/src/hooks/useApi";
+import { SignInFormData, SignUpFormData } from "@/src/types/auth";
+import { useStorage } from "@/src/hooks/useStorage";
 
 export const useAuth = () => {
     const { post, loading, error } = useApi();
