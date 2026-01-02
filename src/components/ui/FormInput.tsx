@@ -77,7 +77,7 @@ const FormInput: React.FC<FormInputProps> = ({
 
     if (isDateType) {
         return (
-            <div className="custom-datepicker-wrapper">
+            <div className="w-full [&_.react-datepicker-wrapper]:w-full">
                 <div className="relative">
                     <DatePicker
                         selected={selectedDate}
@@ -92,7 +92,24 @@ const FormInput: React.FC<FormInputProps> = ({
                         maxDate={new Date()}
                         className={`w-full h-14 px-6 pt-6 pb-2 pr-12 rounded-2xl bg-white/60 border-none text-black focus:ring-2 focus:ring-black outline-none transition-all ${error ? 'ring-2 ring-red-500' : ''
                             }`}
-                        calendarClassName="custom-calendar"
+                        calendarClassName="!bg-white/95 !backdrop-blur-xl !border !border-black/10 !rounded-2xl !shadow-2xl !p-4 !font-sans
+                            [&_.react-datepicker__header]:!bg-transparent [&_.react-datepicker__header]:!border-none [&_.react-datepicker__header]:!p-0 [&_.react-datepicker__header]:!mb-3
+                            [&_.react-datepicker__current-month]:!font-bold [&_.react-datepicker__current-month]:!text-base [&_.react-datepicker__current-month]:!text-gray-900 [&_.react-datepicker__current-month]:!mb-3
+                            [&_.react-datepicker__day-names]:!flex [&_.react-datepicker__day-names]:!justify-between [&_.react-datepicker__day-names]:!mb-2
+                            [&_.react-datepicker__day-name]:!text-gray-500 [&_.react-datepicker__day-name]:!text-xs [&_.react-datepicker__day-name]:!font-bold [&_.react-datepicker__day-name]:!w-9 [&_.react-datepicker__day-name]:!leading-9 [&_.react-datepicker__day-name]:!m-0
+                            [&_.react-datepicker__month]:!m-0
+                            [&_.react-datepicker__week]:!flex [&_.react-datepicker__week]:!justify-between [&_.react-datepicker__week]:!mb-1
+                            [&_.react-datepicker__day]:!w-9 [&_.react-datepicker__day]:!h-9 [&_.react-datepicker__day]:!leading-9 [&_.react-datepicker__day]:!m-0 [&_.react-datepicker__day]:!rounded-lg [&_.react-datepicker__day]:!text-gray-900 [&_.react-datepicker__day]:!text-sm [&_.react-datepicker__day]:!transition-all hover:[&_.react-datepicker__day]:!bg-gray-100
+                            [&_.react-datepicker__day--selected]:!bg-black [&_.react-datepicker__day--selected]:!text-white hover:[&_.react-datepicker__day--selected]:!bg-gray-800 [&_.react-datepicker__day--selected]:!font-bold
+                            [&_.react-datepicker__day--today]:!font-bold [&_.react-datepicker__day--today]:!text-black
+                            [&_.react-datepicker__day--outside-month]:!text-gray-300
+                            [&_.react-datepicker__day--disabled]:!text-gray-300 [&_.react-datepicker__day--disabled]:!cursor-not-allowed
+                            [&_.react-datepicker__navigation]:!top-4 [&_.react-datepicker__navigation]:!w-8 [&_.react-datepicker__navigation]:!h-8 [&_.react-datepicker__navigation]:!rounded-lg [&_.react-datepicker__navigation]:!transition-all hover:[&_.react-datepicker__navigation]:!bg-gray-100
+                            [&_.react-datepicker__navigation-icon::before]:!border-black [&_.react-datepicker__navigation-icon::before]:!border-t-2 [&_.react-datepicker__navigation-icon::before]:!border-r-2
+                            [&_.react-datepicker__year-dropdown]:!bg-white/95 [&_.react-datepicker__year-dropdown]:!backdrop-blur-lg [&_.react-datepicker__year-dropdown]:!border [&_.react-datepicker__year-dropdown]:!border-black/10 [&_.react-datepicker__year-dropdown]:!rounded-xl [&_.react-datepicker__year-dropdown]:!p-2 [&_.react-datepicker__year-dropdown]:!shadow-xl
+                            [&_.react-datepicker__year-option]:!p-2 [&_.react-datepicker__year-option]:!rounded-lg [&_.react-datepicker__year-option]:!transition-all hover:[&_.react-datepicker__year-option]:!bg-gray-100
+                            [&_.react-datepicker__year-option--selected]:!bg-black [&_.react-datepicker__year-option--selected]:!text-white
+                            [&_.react-datepicker__year-read-view]:!border [&_.react-datepicker__year-read-view]:!border-black/10 [&_.react-datepicker__year-read-view]:!rounded-lg [&_.react-datepicker__year-read-view]:!px-2 [&_.react-datepicker__year-read-view]:!py-1"
                         wrapperClassName="w-full"
                     />
                     <label
@@ -113,181 +130,50 @@ const FormInput: React.FC<FormInputProps> = ({
                         {error.message}
                     </span>
                 )}
-                <style jsx global>{`
-                    .custom-datepicker-wrapper .react-datepicker-wrapper {
-                        width: 100%;
-                    }
-
-                    .custom-calendar {
-                        font-family: inherit;
-                        background: rgba(255, 255, 255, 0.95);
-                        backdrop-filter: blur(10px);
-                        border: 1px solid rgba(0, 0, 0, 0.1);
-                        border-radius: 16px;
-                        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-                        padding: 16px;
-                    }
-
-                    .custom-calendar .react-datepicker__header {
-                        background: transparent;
-                        border: none;
-                        padding: 0;
-                        margin-bottom: 12px;
-                    }
-
-                    .custom-calendar .react-datepicker__current-month {
-                        font-weight: 600;
-                        font-size: 16px;
-                        color: #111;
-                        margin-bottom: 12px;
-                    }
-
-                    .custom-calendar .react-datepicker__day-names {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 8px;
-                    }
-
-                    .custom-calendar .react-datepicker__day-name {
-                        color: #666;
-                        font-size: 12px;
-                        font-weight: 600;
-                        width: 36px;
-                        line-height: 36px;
-                        margin: 0;
-                    }
-
-                    .custom-calendar .react-datepicker__month {
-                        margin: 0;
-                    }
-
-                    .custom-calendar .react-datepicker__week {
-                        display: flex;
-                        justify-content: space-between;
-                        margin-bottom: 4px;
-                    }
-
-                    .custom-calendar .react-datepicker__day {
-                        width: 36px;
-                        height: 36px;
-                        line-height: 36px;
-                        margin: 0;
-                        border-radius: 8px;
-                        color: #111;
-                        font-size: 14px;
-                        transition: all 0.2s;
-                    }
-
-                    .custom-calendar .react-datepicker__day:hover {
-                        background: rgba(0, 0, 0, 0.05);
-                        border-radius: 8px;
-                    }
-
-                    .custom-calendar .react-datepicker__day--selected {
-                        background: #000;
-                        color: #fff;
-                        font-weight: 600;
-                    }
-
-                    .custom-calendar .react-datepicker__day--selected:hover {
-                        background: #333;
-                    }
-
-                    .custom-calendar .react-datepicker__day--today {
-                        font-weight: 600;
-                        color: #000;
-                    }
-
-                    .custom-calendar .react-datepicker__day--outside-month {
-                        color: #ccc;
-                    }
-
-                    .custom-calendar .react-datepicker__day--disabled {
-                        color: #ccc;
-                        cursor: not-allowed;
-                    }
-
-                    .custom-calendar .react-datepicker__navigation {
-                        top: 16px;
-                        width: 32px;
-                        height: 32px;
-                        border-radius: 8px;
-                        transition: all 0.2s;
-                    }
-
-                    .custom-calendar .react-datepicker__navigation:hover {
-                        background: rgba(0, 0, 0, 0.05);
-                    }
-
-                    .custom-calendar .react-datepicker__navigation-icon::before {
-                        border-color: #000;
-                        border-width: 2px 2px 0 0;
-                    }
-
-                    .custom-calendar .react-datepicker__year-dropdown,
-                    .custom-calendar .react-datepicker__month-dropdown {
-                        background: rgba(255, 255, 255, 0.95);
-                        backdrop-filter: blur(10px);
-                        border: 1px solid rgba(0, 0, 0, 0.1);
-                        border-radius: 12px;
-                        padding: 8px;
-                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                    }
-
-                    .custom-calendar .react-datepicker__year-option,
-                    .custom-calendar .react-datepicker__month-option {
-                        padding: 8px 12px;
-                        border-radius: 8px;
-                        transition: all 0.2s;
-                    }
-
-                    .custom-calendar .react-datepicker__year-option:hover,
-                    .custom-calendar .react-datepicker__month-option:hover {
-                        background: rgba(0, 0, 0, 0.05);
-                    }
-
-                    .custom-calendar .react-datepicker__year-option--selected,
-                    .custom-calendar .react-datepicker__month-option--selected {
-                        background: #000;
-                        color: #fff;
-                    }
-
-                    .custom-calendar .react-datepicker__year-read-view,
-                    .custom-calendar .react-datepicker__month-read-view {
-                        border: 1px solid rgba(0, 0, 0, 0.1);
-                        border-radius: 8px;
-                        padding: 4px 8px;
-                    }
-                `}</style>
             </div>
         );
     }
 
     const { onChange, ...restRegistration } = registration;
 
+    const sanitizeTelValue = (value: string) => {
+        let val = value.replace(/[^\d+]/g, '');
+        if (val.includes('+', 1)) {
+            val = val[0] + val.substring(1).replace(/\+/g, '');
+        }
+        if (val.startsWith('++')) {
+            val = '+' + val.replace(/^\++/, '');
+        }
+        return val;
+    };
+
     const handleInput = (e: React.FormEvent<HTMLInputElement>) => {
         const target = e.target as HTMLInputElement;
         if (type === 'tel') {
-            let val = target.value;
-            // Immediate sanitization: remove anything that isn't a digit or a leading +
-            val = val.replace(/[^\d+]/g, '');
-            // Ensure + only appears at the very beginning
-            if (val.includes('+', 1)) {
-                val = val.at(0) + val.substring(1).replace(/\+/g, '');
-            }
-            // Prevent multiple + at the start
-            if (val.startsWith('++')) {
-                val = '+' + val.replace(/^\++/, '');
-            }
-            target.value = val;
+            target.value = sanitizeTelValue(target.value);
         }
-        // Call the original onChange from react-hook-form
         onChange({
             target: {
                 name: registration.name,
                 value: target.value
             }
         } as any);
+    };
+
+    const handleTelKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (type !== 'tel') return;
+
+        const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
+        const isControlKey = allowedKeys.includes(e.key) ||
+            ((e.ctrlKey || e.metaKey) && ['a', 'c', 'v', 'x'].includes(e.key.toLowerCase()));
+
+        const isPlusKey = e.key === '+' && !e.currentTarget.value.includes('+');
+
+        if (isControlKey || isPlusKey) return;
+
+        if (e.shiftKey || e.key < '0' || e.key > '9') {
+            e.preventDefault();
+        }
     };
 
     return (
@@ -302,23 +188,7 @@ const FormInput: React.FC<FormInputProps> = ({
                     autoComplete={autoComplete}
                     onFocus={handleFocus}
                     onBlur={handleBlur}
-                    onKeyDown={(e) => {
-                        if (type === 'tel') {
-                            // Desktop-level blocking
-                            if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter'].includes(e.key) ||
-                                (e.key === '+' && !e.currentTarget.value.includes('+')) ||
-                                (e.key === 'a' && (e.ctrlKey === true || e.metaKey === true)) ||
-                                (e.key === 'c' && (e.ctrlKey === true || e.metaKey === true)) ||
-                                (e.key === 'v' && (e.ctrlKey === true || e.metaKey === true)) ||
-                                (e.key === 'x' && (e.ctrlKey === true || e.metaKey === true)) ||
-                                (e.key === 'Home' || e.key === 'End' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
-                                return;
-                            }
-                            if ((e.shiftKey || (e.key < '0' || e.key > '9'))) {
-                                e.preventDefault();
-                            }
-                        }
-                    }}
+                    onKeyDown={handleTelKeyDown}
                     className={`w-full h-14 px-6 pt-6 pb-2 ${isPasswordType ? 'pr-12' : ''
                         } rounded-2xl bg-white/60 border-none text-black focus:ring-2 focus:ring-black outline-none transition-all peer ${error ? 'ring-2 ring-red-500' : ''
                         }`}

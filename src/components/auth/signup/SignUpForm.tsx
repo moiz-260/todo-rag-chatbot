@@ -12,9 +12,10 @@ import PhoneInput from '@/src/components/ui/PhoneInput';
 import toast from "react-hot-toast";
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/hooks/useAuth';
+import { SignupStep } from '@/src/constants/signupStep';
 
 const SignUpForm: React.FC = () => {
-    const [step, setStep] = useState(1);
+    const [step, setStep] = useState<SignupStep>(SignupStep.USER_INFO);
     const [activeField, setActiveField] = useState<string>('');
     const riveRef = useRef<RiveTeddyAnimationRef>(null);
     const router = useRouter();
@@ -50,21 +51,16 @@ const SignUpForm: React.FC = () => {
         let currentValue: string = '';
         let currentDate: Date = new Date();
 
-        switch (activeField) {
-            case 'fullName':
-                currentValue = fullName || '';
-                break;
-            case 'dateOfBirth':
-                currentDate = dateOfBirth || new Date();
-                break;
-            case 'phoneNumber':
-                currentValue = phoneNumber || '';
-                break;
-            case 'email':
-                currentValue = email || '';
-                break;
-            default:
-                currentValue = '';
+        if (activeField === 'fullName') {
+            currentValue = fullName || '';
+        } else if (activeField === 'dateOfBirth') {
+            currentDate = dateOfBirth || new Date();
+        } else if (activeField === 'phoneNumber') {
+            currentValue = phoneNumber || '';
+        } else if (activeField === 'email') {
+            currentValue = email || '';
+        } else {
+            currentValue = '';
         }
 
         riveRef.current?.updateEmailLook(currentValue.length);
@@ -83,7 +79,7 @@ const SignUpForm: React.FC = () => {
     const handleNext = async () => {
         const isStep1Valid = await trigger(['fullName', 'dateOfBirth', 'phoneNumber']);
         if (isStep1Valid) {
-            setStep(2);
+            setStep(SignupStep.ACCOUNT_INFO);
         }
     };
 
@@ -119,13 +115,13 @@ const SignUpForm: React.FC = () => {
 
                 <div className="flex flex-col gap-1 text-center sm:text-left">
                     <h1 className="text-3xl font-bold tracking-tight text-gray-900 leading-[1.1]">
-                        {step === 1 ? "Personal Info" : "Account Details"}
+                        {step === SignupStep.USER_INFO ? "Personal Info" : "Account Details"}
                     </h1>
                 </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit, onError)} className="flex flex-col gap-6">
-                {step === 1 ? (
+                {step === SignupStep.USER_INFO ? (
                     <>
                         <FormInput
                             key="fullName"
@@ -215,7 +211,7 @@ const SignUpForm: React.FC = () => {
                         <div className="flex gap-4">
                             <button
                                 type="button"
-                                onClick={() => setStep(1)}
+                                onClick={() => setStep(SignupStep.USER_INFO)}
                                 disabled={authLoading}
                                 className="h-14 flex-1 rounded-full bg-gray-100 text-black font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
