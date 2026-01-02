@@ -11,11 +11,11 @@ import FormInput from '@/src/components/ui/FormInput';
 import PhoneInput from '@/src/components/ui/PhoneInput';
 import toast from "react-hot-toast";
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/src/hooks/useAuth';
 
 const SignUpForm: React.FC = () => {
     const [step, setStep] = useState(1);
     const [activeField, setActiveField] = useState<string>('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const riveRef = useRef<RiveTeddyAnimationRef>(null);
     const router = useRouter();
 
@@ -87,53 +87,28 @@ const SignUpForm: React.FC = () => {
         }
     };
 
+    const { register: registerUser, loading: authLoading } = useAuth();
+
     const onSubmit = async (data: SignUpFormData) => {
-        setIsSubmitting(true);
-
         try {
-            const response = await fetch('/api/auth/signup', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fullName: data.fullName,
-                    dateOfBirth: data.dateOfBirth,
-                    phoneNumber: data.phoneNumber,
-                    email: data.email,
-                    password: data.password,
-                }),
-            });
+            const result = await registerUser(data);
 
-            const result = await response.json();
+            if (result) {
+                riveRef.current?.triggerSuccess();
+                toast.success("Your account has been created successfully! Welcome to our family.");
 
-            if (!response.ok) {
-                throw new Error(result.error || 'Sign up failed');
+                setTimeout(() => {
+                    router.push('/signin');
+                }, 1500);
             }
-
-            localStorage.setItem('token', result.token);
-            localStorage.setItem('user', JSON.stringify(result.user));
-
-            console.log('Sign Up Success:', result);
-            riveRef.current?.triggerSuccess();
-            toast.success("Your account has been created successfully! Welcome to our family.");
-
-            localStorage.removeItem('signup-form');
-
-            setTimeout(() => {
-                router.push('/signin');
-            }, 1500);
         } catch (error: any) {
-            console.error('Sign Up Error:', error);
+            console.error(error);
             riveRef.current?.triggerFail();
-            toast.error(error.message || 'Sign up failed. Please try again.');
-        } finally {
-            setIsSubmitting(false);
+            toast.error(error.message || "Sign up failed. Please try again.");
         }
     };
 
     const onError = (err: any) => {
-        console.log(`Validation error: ${err}`);
         riveRef.current?.triggerFail();
     };
 
@@ -241,17 +216,17 @@ const SignUpForm: React.FC = () => {
                             <button
                                 type="button"
                                 onClick={() => setStep(1)}
-                                disabled={isSubmitting}
+                                disabled={authLoading}
                                 className="h-14 flex-1 rounded-full bg-gray-100 text-black font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Back
                             </button>
                             <button
                                 type="submit"
-                                disabled={isSubmitting}
+                                disabled={authLoading}
                                 className="h-14 flex-1 rounded-full bg-black text-white font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {isSubmitting ? 'Creating Account...' : 'Sign up'}
+                                {authLoading ? 'Creating Account...' : 'Sign up'}
                             </button>
                         </div>
                     </>

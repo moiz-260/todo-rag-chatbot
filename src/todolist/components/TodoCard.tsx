@@ -1,6 +1,6 @@
 import React from 'react';
 import GlassCard from '@/src/components/ui/GlassCard';
-import { Todo } from '../types';
+import { Todo } from '@/src/todolist/types';
 
 interface TodoCardProps {
     todo: Todo;

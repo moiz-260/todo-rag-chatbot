@@ -1,15 +1,19 @@
 import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
-import { Todo, Toast, ConfirmModalState, DetailModalState } from '../types';
+import { useStorage } from '@/src/hooks/useStorage';
+import { Todo, ConfirmModalState, DetailModalState } from '@/src/todolist/types';
+import toast from 'react-hot-toast';
+import { useTodoApi } from '@/src/hooks/useTodoApi';
+import { useAuth } from '@/src/hooks/useAuth';
 
 export const useTodoManager = () => {
     const [todos, setTodos] = useState<Todo[]>([]);
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [loading, setLoading] = useState(false);
+    const { fetchTodos: getTodos, createTodo, updateTodo, deleteTodo, loading: apiLoading } = useTodoApi();
+    const { logout } = useAuth();
+    const { getCookie, getItem } = useStorage();
     const [userId, setUserId] = useState<string>('');
-    const [toasts, setToasts] = useState<Toast[]>([]);
     const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({
         isOpen: false,
         todoId: null
@@ -20,18 +24,9 @@ export const useTodoManager = () => {
     });
     const [email, setEmail] = useState<string>('');
 
-    const showToast = (message: string, type: 'success' | 'error' | 'warning') => {
-        const id = Date.now();
-        setToasts(prev => [...prev, { id, message, type }]);
-    };
-
-    const removeToast = (id: number) => {
-        setToasts(prev => prev.filter(toast => toast.id !== id));
-    };
-
     useEffect(() => {
-        const userIdFromCookie = Cookies.get('userId');
-        const emailFromCookie = Cookies.get('email');
+        const userIdFromCookie = getCookie('userId');
+        const emailFromCookie = getCookie('email');
 
         if (userIdFromCookie) {
             setUserId(userIdFromCookie);
@@ -42,7 +37,7 @@ export const useTodoManager = () => {
         }
 
         if (!userIdFromCookie || !emailFromCookie) {
-            const user = localStorage.getItem('user');
+            const user = getItem('user');
             if (user) {
                 const userData = JSON.parse(user);
                 if (!userIdFromCookie) setUserId(userData.id || userData._id || userData.email);
@@ -51,7 +46,7 @@ export const useTodoManager = () => {
                 window.location.href = '/';
             }
         }
-    }, []);
+    }, [getCookie, getItem]);
 
     useEffect(() => {
         if (email) {
@@ -61,14 +56,12 @@ export const useTodoManager = () => {
 
     const fetchTodos = async () => {
         try {
-            const query = email ? `email=${email}` : `userId=${userId}`;
-            const response = await fetch(`/api/todos?${query}`);
-            const data = await response.json();
-            if (response.ok) {
+            const data = await getTodos(email, userId);
+            if (data) {
                 setTodos(data.todos);
             }
-        } catch (error) {
-            console.error('Error fetching todos:', error);
+        } catch (error: any) {
+            toast.error(error.message || 'Network error while fetching todos');
         }
     };
 
@@ -76,50 +69,29 @@ export const useTodoManager = () => {
         e.preventDefault();
         if (!title.trim() || !description.trim()) return;
 
-        setLoading(true);
-
         try {
             if (editingId) {
-                const response = await fetch(`/api/todos/${editingId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, description }),
-                });
+                const data = await updateTodo(editingId, { title, description });
 
-                const data = await response.json();
-
-                if (response.ok) {
+                if (data) {
                     await fetchTodos();
                     setEditingId(null);
                     setTitle('');
                     setDescription('');
-                    showToast('Todo updated successfully!', 'success');
-                } else {
-                    showToast(data.error || 'Failed to update todo', 'error');
+                    toast.success('Todo updated successfully!');
                 }
             } else {
-                const response = await fetch('/api/todos', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, description, userId, email }),
-                });
+                const data = await createTodo({ title, description, userId, email });
 
-                const data = await response.json();
-
-                if (response.ok) {
+                if (data) {
                     await fetchTodos();
                     setTitle('');
                     setDescription('');
-                    showToast('Todo created successfully!', 'success');
-                } else {
-                    showToast(data.error || 'Failed to create todo', 'error');
+                    toast.success('Todo created successfully!');
                 }
             }
-        } catch (error) {
-            console.error('Error saving todo:', error);
-            showToast('Network error while saving todo', 'error');
-        } finally {
-            setLoading(false);
+        } catch (error: any) {
+            toast.error(error.message || 'Network error while saving todo');
         }
     };
 
@@ -141,21 +113,14 @@ export const useTodoManager = () => {
         if (!id) return;
 
         try {
-            const response = await fetch(`/api/todos/${id}`, {
-                method: 'DELETE',
-            });
+            const data = await deleteTodo(id);
 
-            const data = await response.json();
-
-            if (response.ok) {
+            if (data) {
                 await fetchTodos();
-                showToast('Todo deleted successfully!', 'success');
-            } else {
-                showToast(data.error || 'Failed to delete todo', 'error');
+                toast.success('Todo deleted successfully!');
             }
-        } catch (error) {
-            console.error('Error deleting todo:', error);
-            showToast('Network error while deleting todo', 'error');
+        } catch (error: any) {
+            toast.error(error.message || 'Network error while deleting todo');
         }
     };
 
@@ -170,11 +135,8 @@ export const useTodoManager = () => {
     };
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        Cookies.remove('token');
-        Cookies.remove('userId');
-        window.location.href = '/';
+        logout();
+        toast.success('Logged out successfully!');
     };
 
     return {
@@ -183,8 +145,7 @@ export const useTodoManager = () => {
         title,
         description,
         editingId,
-        loading,
-        toasts,
+        loading: apiLoading,
         confirmModal,
         detailModal,
 
@@ -195,8 +156,6 @@ export const useTodoManager = () => {
         setDetailModal,
 
         // Functions
-        showToast,
-        removeToast,
         handleSubmit,
         handleEdit,
         handleDeleteClick,

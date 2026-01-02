@@ -2,23 +2,22 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import AuthLayout from "@/src/components/layout/AuthLayout";
 import SignInForm from "@/src/components/auth/authContainer";
+import { isTokenValid } from "@/src/utils/auth";
 
 export default function LandingPage() {
   const [isChecking, setIsChecking] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const token = Cookies.get("token");
-
-    if (token) {
+    if (isTokenValid()) {
       router.push("/todolist");
     } else {
       setIsChecking(false);
     }
   }, [router]);
+
 
   if (isChecking) {
     return (

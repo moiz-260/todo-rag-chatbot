@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/src/lib/mongodb';
 import User from '@/src/models/User';
 import jwt from 'jsonwebtoken';
-
+import { ApiStatus } from '@/src/constants/apiStatus';
 
 export async function POST(request: NextRequest) {
     try {
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         if (!fullName || !dateOfBirth || !phoneNumber || !email || !password) {
             return NextResponse.json(
                 { error: 'All fields are required' },
-                { status: 400 }
+                { status: ApiStatus.BAD_REQUEST }
             );
         }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
                         ? 'Email already registered'
                         : 'Phone number already registered',
                 },
-                { status: 409 }
+                { status: ApiStatus.CONFLICT }
             );
         }
 
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
         if (!process.env.JWT_SECRET) {
             return NextResponse.json(
                 { error: 'Server configuration error' },
-                { status: 500 }
+                { status: ApiStatus.SERVER_ERROR }
             );
         }
 
@@ -68,30 +68,37 @@ export async function POST(request: NextRequest) {
                 },
                 token,
             },
-            { status: 201 }
+            { status: ApiStatus.SUCCESS }
         );
-    } catch (error: any) {
-        if (error.name === 'ValidationError') {
-            return NextResponse.json(
-                { error: 'Validation failed', details: error.errors },
-                { status: 400 }
-            );
-        }
+    } catch (error: unknown) {
+        if (error instanceof Error) {
+            if (error.name === 'ValidationError') {
+                return NextResponse.json(
+                    { error: 'Validation failed', details: (error as any).errors },
+                    { status: ApiStatus.BAD_REQUEST }
+                );
+            }
 
-        if (error.name === 'MongooseServerSelectionError') {
+            if (error.name === 'MongooseServerSelectionError') {
+                return NextResponse.json(
+                    { error: 'Database connection failed. Please check your MongoDB URI.' },
+                    { status: ApiStatus.SERVER_ERROR }
+                );
+            }
+
             return NextResponse.json(
-                { error: 'Database connection failed. Please check your MongoDB URI.' },
-                { status: 500 }
+                {
+                    error: 'Internal server error',
+                    message: error.message,
+                    details: process.env.NODE_ENV === 'development' ? (error as any).stack : undefined
+                },
+                { status: ApiStatus.SERVER_ERROR }
             );
         }
 
         return NextResponse.json(
-            {
-                error: 'Internal server error',
-                message: error.message,
-                details: process.env.NODE_ENV === 'development' ? error.stack : undefined
-            },
-            { status: 500 }
+            { error: 'Internal server error' },
+            { status: ApiStatus.SERVER_ERROR }
         );
     }
 }

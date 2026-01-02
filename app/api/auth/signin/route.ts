@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/src/lib/mongodb';
 import User from '@/src/models/User';
 import jwt from 'jsonwebtoken';
+import { ApiStatus } from '@/src/constants/apiStatus';
 
 export async function POST(request: NextRequest) {
     try {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest) {
         if (!email || !password) {
             return NextResponse.json(
                 { error: 'Email and password are required' },
-                { status: 400 }
+                { status: ApiStatus.BAD_REQUEST }
             );
         }
 
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest) {
         if (!user) {
             return NextResponse.json(
                 { error: 'Invalid email' },
-                { status: 401 }
+                { status: ApiStatus.UNAUTHORIZED }
             );
         }
 
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
         if (!isPasswordValid) {
             return NextResponse.json(
                 { error: 'Invalid password' },
-                { status: 401 }
+                { status: ApiStatus.UNAUTHORIZED }
             );
         }
 
@@ -54,13 +55,17 @@ export async function POST(request: NextRequest) {
                 },
                 token,
             },
-            { status: 200 }
+            { status: ApiStatus.SUCCESS }
         );
-    } catch (error: any) {
-        console.error('Sign in error:', error);
+    } catch (error: unknown) {
+
+        const message = error instanceof Error ? error.message : 'Internal server error';
+        const stack = process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined;
+
         return NextResponse.json(
-            { error: 'Internal server error' },
-            { status: 500 }
+            { error: message, stack },
+            { status: ApiStatus.SERVER_ERROR }
         );
     }
+
 }

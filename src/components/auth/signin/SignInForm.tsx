@@ -9,12 +9,11 @@ import { useFormPersistence } from "@/src/hooks/useFormPersistence";
 import RiveTeddyAnimation, { RiveTeddyAnimationRef } from "@/src/components/RiveTeddyAnimation";
 import FormInput from "@/src/components/ui/FormInput";
 import toast from "react-hot-toast";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/src/hooks/useAuth";
 
 const SignInForm: React.FC = () => {
     const [activeField, setActiveField] = useState<string>("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const riveRef = useRef<RiveTeddyAnimationRef>(null);
     const router = useRouter();
 
@@ -54,41 +53,24 @@ const SignInForm: React.FC = () => {
         riveRef.current?.handleEmailBlur();
     };
 
+    const { login, loading: authLoading } = useAuth();
+
     const onSubmit = async (data: SignInFormData) => {
-        setIsSubmitting(true);
-
         try {
-            const response = await fetch("/api/auth/signin", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: data.email, password: data.password }),
-            });
+            const result = await login(data);
 
-            const result = await response.json();
+            if (result) {
+                riveRef.current?.triggerSuccess();
+                toast.success("Login successful! Welcome back to your account.");
 
-            if (!response.ok) throw new Error(result.error || "Sign in failed");
-
-            localStorage.setItem("token", result.token);
-            localStorage.setItem("user", JSON.stringify(result.user));
-            localStorage.setItem("email", result.user.email);
-            Cookies.set("token", result.token, { expires: 7 });
-            Cookies.set("userId", result.user.id, { expires: 7 });
-            Cookies.set("email", result.user.email, { expires: 7 });
-
-            riveRef.current?.triggerSuccess();
-            toast.success("Login successful! Welcome back to your account.");
-
-            localStorage.removeItem("signin-form");
-
-            setTimeout(() => {
-                window.location.href = "/todolist";
-            }, 1500);
+                setTimeout(() => {
+                    window.location.href = "/todolist";
+                }, 1500);
+            }
         } catch (error: any) {
             console.error(error);
             riveRef.current?.triggerFail();
             toast.error(error.message || "Invalid email or password");
-        } finally {
-            setIsSubmitting(false);
         }
     };
 
@@ -133,10 +115,10 @@ const SignInForm: React.FC = () => {
 
                 <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={authLoading}
                     className="h-14 w-full px-10 rounded-full bg-black text-white font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isSubmitting ? "Logging in..." : "Log in"}
+                    {authLoading ? "Logging in..." : "Log in"}
                 </button>
             </form>
 

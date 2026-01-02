@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { UseFormReturn, Path, PathValue } from "react-hook-form";
+import { useStorage } from "./useStorage";
 
 interface UseFormPersistenceOptions<TFieldValues extends Record<string, any>> {
     formId: string;
@@ -17,6 +18,7 @@ export const useFormPersistence = <
     persistFields,
 }: UseFormPersistenceOptions<TFieldValues>) => {
     const { watch, setValue } = formMethods;
+    const { setItem, getItem } = useStorage();
     const hasRestored = useRef(false);
 
     const storageKey = `form_persistence_${formId}`;
@@ -24,7 +26,7 @@ export const useFormPersistence = <
     useEffect(() => {
         if (hasRestored.current) return;
 
-        const savedData = localStorage.getItem(storageKey);
+        const savedData = getItem(storageKey);
         if (!savedData) return;
 
         try {
@@ -43,9 +45,9 @@ export const useFormPersistence = <
 
             hasRestored.current = true;
         } catch (error) {
-            console.error("Form persistence restore failed:", error);
+
         }
-    }, [persistFields, setValue, storageKey]);
+    }, [persistFields, setValue, storageKey, getItem]);
 
     useEffect(() => {
         const subscription = watch((values) => {
@@ -57,9 +59,9 @@ export const useFormPersistence = <
                 {} as Partial<TFieldValues>
             );
 
-            localStorage.setItem(storageKey, JSON.stringify(dataToPersist));
+            setItem(storageKey, dataToPersist);
         });
 
         return () => subscription.unsubscribe();
-    }, [persistFields, storageKey, watch]);
+    }, [persistFields, storageKey, watch, setItem]);
 };

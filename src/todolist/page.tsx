@@ -3,12 +3,11 @@
 import React, { useState } from "react";
 import AuthLayout from "@/src/components/layout/AuthLayout";
 import GlassCard from "@/src/components/ui/GlassCard";
-import { useTodoManager } from "./hooks/useTodoManager";
-import ToastContainer from "./components/ToastContainer";
-import ConfirmModal from "./components/ConfirmModal";
-import TodoDetailModal from "./components/TodoDetailModal";
-import TodoForm from "./components/TodoForm";
-import TodoCard from "./components/TodoCard";
+import { useTodoManager } from "@/src/todolist/hooks/useTodoManager";
+import ConfirmModal from "@/src/todolist/components/ConfirmModal";
+import TodoDetailModal from "@/src/todolist/components/TodoDetailModal";
+import TodoForm from "@/src/todolist/components/TodoForm";
+import TodoCard from "@/src/todolist/components/TodoCard";
 // import ChatBot from "@/src/chatbot/ChatBot";
 
 const TodoList: React.FC = () => {
@@ -20,14 +19,12 @@ const TodoList: React.FC = () => {
     description,
     editingId,
     loading,
-    toasts,
     confirmModal,
     detailModal,
     setTitle,
     setDescription,
     setConfirmModal,
     setDetailModal,
-    removeToast,
     handleSubmit,
     handleEdit,
     handleDeleteClick,
@@ -39,9 +36,6 @@ const TodoList: React.FC = () => {
 
   return (
     <AuthLayout>
-      {/* Toast Container */}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
-
       {/* Confirmation Modal */}
       <ConfirmModal
         isOpen={confirmModal.isOpen}
@@ -49,6 +43,7 @@ const TodoList: React.FC = () => {
         onCancel={() => setConfirmModal({ isOpen: false, todoId: null })}
         message="Are you sure you want to delete this todo? This action cannot be undone."
       />
+
 
       {/* Todo Detail Modal */}
       <TodoDetailModal

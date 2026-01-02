@@ -1,5 +1,4 @@
-import React from 'react';
-import { Todo } from '../types';
+import { Todo } from '@/src/todolist/types';
 
 interface TodoDetailModalProps {
     isOpen: boolean;

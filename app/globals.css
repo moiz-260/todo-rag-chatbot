@@ -25,7 +25,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Premium Minimal Scrollbar */
 .scrollbar-minimal::-webkit-scrollbar {
   width: 6px;
 }
@@ -45,7 +44,6 @@ body {
   background-color: rgba(0, 0, 0, 0.2);
 }
 
-/* Firefox support */
 .scrollbar-minimal {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.1) transparent;

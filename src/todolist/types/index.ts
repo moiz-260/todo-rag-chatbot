@@ -5,12 +5,6 @@ export interface Todo {
     createdAt: string;
 }
 
-export interface Toast {
-    id: number;
-    message: string;
-    type: 'success' | 'error' | 'warning';
-}
-
 export interface ConfirmModalState {
     isOpen: boolean;
     todoId: string | null;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/src/lib/mongodb';
 import Todo from '@/src/models/Todo';
 import mongoose from 'mongoose';
+import { ApiStatus } from '@/src/constants/apiStatus';
 // import { upsertTodoToPinecone, deleteTodoFromPinecone } from '@/src/lib/ai';
 
 export async function PUT(
@@ -12,25 +13,21 @@ export async function PUT(
         await dbConnect();
         const { id } = await params;
 
-        console.log('PUT - Received ID:', id);
-
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            console.error('PUT - Invalid ObjectId format:', id);
             return NextResponse.json(
                 { error: 'Invalid todo ID format' },
-                { status: 400 }
+                { status: ApiStatus.BAD_REQUEST }
             );
         }
 
         const body = await request.json();
         const { title, description } = body;
 
-        console.log('PUT - Update data:', { title, description });
 
         if (!title || !description) {
             return NextResponse.json(
                 { error: 'Title and description are required' },
-                { status: 400 }
+                { status: ApiStatus.BAD_REQUEST }
             );
         }
 
@@ -41,10 +38,9 @@ export async function PUT(
         );
 
         if (!todo) {
-            console.error('PUT - Todo not found for ID:', id);
             return NextResponse.json(
                 { error: 'Todo not found' },
-                { status: 404 }
+                { status: ApiStatus.NOT_FOUND }
             );
         }
 
@@ -61,13 +57,14 @@ export async function PUT(
         //     console.error('Failed to update Pinecone:', error);
         // }
 
-        console.log('PUT - Successfully updated todo:', todo);
-        return NextResponse.json({ todo }, { status: 200 });
-    } catch (error: any) {
-        console.error('PUT - Error updating todo:', error);
+        return NextResponse.json({ todo }, { status: ApiStatus.SUCCESS });
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Failed to update todo';
+        const stack = process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined;
+
         return NextResponse.json(
-            { error: 'Failed to update todo', details: error.message },
-            { status: 500 }
+            { error: message, stack },
+            { status: ApiStatus.SERVER_ERROR }
         );
     }
 }
@@ -81,22 +78,19 @@ export async function DELETE(
 
         const { id } = await params;
 
-        console.log('DELETE - Received ID:', id);
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            console.error('DELETE - Invalid ObjectId format:', id);
             return NextResponse.json(
                 { error: 'Invalid todo ID format' },
-                { status: 400 }
+                { status: ApiStatus.BAD_REQUEST }
             );
         }
 
         const todo = await Todo.findByIdAndDelete(id);
 
         if (!todo) {
-            console.error('DELETE - Todo not found for ID:', id);
             return NextResponse.json(
                 { error: 'Todo not found' },
-                { status: 404 }
+                { status: ApiStatus.NOT_FOUND }
             );
         }
 
@@ -107,16 +101,18 @@ export async function DELETE(
         //     console.error('Failed to delete from Pinecone:', error);
         // }
 
-        console.log('DELETE - Successfully deleted todo:', todo);
         return NextResponse.json(
             { message: 'Todo deleted successfully', todo },
-            { status: 200 }
+            { status: ApiStatus.SUCCESS }
         );
-    } catch (error: any) {
-        console.error('DELETE - Error deleting todo:', error);
+    } catch (error: unknown) {
+
+        const message = error instanceof Error ? error.message : 'Failed to delete todo';
+        const stack = process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined;
+
         return NextResponse.json(
-            { error: 'Failed to delete todo', details: error.message },
-            { status: 500 }
+            { error: message, stack },
+            { status: ApiStatus.SERVER_ERROR }
         );
     }
 }
