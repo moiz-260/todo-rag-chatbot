@@ -31,7 +31,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
     const dropdownRef = useRef<HTMLDivElement>(null);
     const searchInputRef = useRef<HTMLInputElement>(null);
 
-    // Filter countries based on search
     const filteredCountries = useMemo(() => {
         return countries.filter(c =>
             c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -39,7 +38,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         );
     }, [searchQuery]);
 
-    // Extract the number part from the full value
     const numberPart = useMemo(() => {
         if (value.startsWith(selectedCountry.dialCode)) {
             return value.slice(selectedCountry.dialCode.length);
@@ -47,7 +45,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         return value;
     }, [value, selectedCountry]);
 
-    // Handle clicks outside to close dropdown
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -58,7 +55,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Focus search input when dropdown opens
     useEffect(() => {
         if (isOpen && searchInputRef.current) {
             searchInputRef.current.focus();
@@ -69,13 +65,11 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
         setSelectedCountry(country);
         setIsOpen(false);
         setSearchQuery('');
-        // Update the full value with the new dial code
         onChange(country.dialCode + numberPart);
     };
 
     const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value;
-        // Only allow digits
         val = val.replace(/\D/g, '');
         onChange(selectedCountry.dialCode + val);
     };
@@ -98,7 +92,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 className={`flex items-center w-full h-14 rounded-2xl bg-white/60 backdrop-blur-md transition-all duration-200 ${error ? 'ring-2 ring-red-500' : isFocused ? 'ring-2 ring-black' : ''
                     }`}
             >
-                {/* Country Code Selector */}
                 <button
                     type="button"
                     onClick={() => setIsOpen(!isOpen)}
@@ -110,7 +103,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                     <ChevronDown size={14} className={`text-gray-400 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Number Input */}
                 <div className="relative flex-1 h-full">
                     <input
                         type="tel"
@@ -118,7 +110,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                         onChange={handleNumberChange}
                         onFocus={handleFocusInput}
                         onBlur={handleBlurInput}
-                        // placeholder={isLabelFloating ? "" : "(000) 000-0000"}
                         className="w-full h-full px-4 pt-6 pb-2 bg-transparent border-none outline-none text-black font-medium text-sm placeholder:text-gray-300"
                     />
                     <label
@@ -132,20 +123,17 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                 </div>
             </div>
 
-            {/* Error Message */}
             {error && (
                 <span className="block mt-1 ml-2 text-xs text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
                     {error.message}
                 </span>
             )}
 
-            {/* Country Dropdown Tooltip/Popover */}
             {isOpen && (
                 <div
                     ref={dropdownRef}
                     className="absolute top-16 left-0 z-[100] w-full max-w-sm bg-white/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200"
                 >
-                    {/* Search Bar */}
                     <div className="p-3 border-b border-gray-100">
                         <div className="relative">
                             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -160,7 +148,6 @@ const PhoneInput: React.FC<PhoneInputProps> = ({
                         </div>
                     </div>
 
-                    {/* Countries List */}
                     <div className="max-h-64 overflow-y-auto scrollbar-minimal">
                         {filteredCountries.length > 0 ? (
                             filteredCountries.map((country) => (

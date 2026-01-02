@@ -2,25 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/src/lib/mongodb';
 import Todo from '@/src/models/Todo';
 import { ApiStatus } from '@/src/constants/apiStatus';
-// import { upsertTodoToPinecone } from '@/src/lib/ai';
+import { verifyToken } from '@/src/lib/auth';
 
 export async function GET(request: NextRequest) {
     try {
         await dbConnect();
 
-        const { searchParams } = new URL(request.url);
-        const userId = searchParams.get('userId');
-        const email = searchParams.get('email');
-
-        if (!userId && !email) {
+        const user = await verifyToken(request);
+        if (!user) {
             return NextResponse.json(
-                { error: 'User ID or Email is required' },
-                { status: ApiStatus.BAD_REQUEST }
+                { error: 'Unauthorized access' },
+                { status: ApiStatus.UNAUTHORIZED }
             );
         }
 
-        const filter = email ? { email } : { userId };
-        const todos = await Todo.find(filter).sort({ createdAt: -1 });
+        const todos = await Todo.find({ userId: user.userId }).sort({ createdAt: -1 });
         return NextResponse.json({ todos }, { status: ApiStatus.SUCCESS });
     } catch (error: any) {
         return NextResponse.json(
@@ -34,12 +30,20 @@ export async function POST(request: NextRequest) {
     try {
         await dbConnect();
 
-        const body = await request.json();
-        const { title, description, userId, email } = body;
-
-        if (!title || !description || !userId) {
+        const user = await verifyToken(request);
+        if (!user) {
             return NextResponse.json(
-                { error: 'Title, description, userId, and email are required' },
+                { error: 'Unauthorized access' },
+                { status: ApiStatus.UNAUTHORIZED }
+            );
+        }
+
+        const body = await request.json();
+        const { title, description } = body;
+
+        if (!title || !description) {
+            return NextResponse.json(
+                { error: 'Title and description are required' },
                 { status: ApiStatus.BAD_REQUEST }
             );
         }
@@ -47,34 +51,16 @@ export async function POST(request: NextRequest) {
         const todo = await Todo.create({
             title,
             description,
-            userId,
-            email,
+            userId: user.userId,
+            email: user.email,
         });
-
-        // Sync with Pinecone for Chatbot
-        // try {
-        //     await upsertTodoToPinecone({
-        //         id: todo._id.toString(),
-        //         title: todo.title,
-        //         description: todo.description,
-        //         userId: todo.userId,
-        //         email: todo.email,
-        //     });
-        // } catch (pineconeError) {
-        //     console.error('Failed to sync with Pinecone:', pineconeError);
-        //     // We don't want to fail the main request if Pinecone fails, 
-        //     // but in a real app you might want to retry or handle this.
-        // }
 
         return NextResponse.json({ todo }, { status: ApiStatus.SUCCESS });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Failed to create todo';
-        const stack = process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined;
-
         return NextResponse.json(
-            { error: message, stack },
+            { error: message },
             { status: ApiStatus.SERVER_ERROR }
         );
     }
-
 }

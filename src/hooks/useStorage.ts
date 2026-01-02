@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { storage } from "../utils/storage";
+import { storage } from "@/src/utils/storage";
 import Cookies from "js-cookie";
 
 export const useStorage = () => {
@@ -27,8 +27,8 @@ export const useStorage = () => {
         storage.removeCookie(key);
     }, []);
 
-    const setSession = useCallback((token: string, user: any) => {
-        storage.setSession(token, user);
+    const setSession = useCallback((token: string) => {
+        storage.setSession(token);
     }, []);
 
     const clearSession = useCallback(() => {

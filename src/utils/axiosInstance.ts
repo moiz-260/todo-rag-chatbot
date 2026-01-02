@@ -1,5 +1,6 @@
 import axios from "axios";
 import { storage } from "@/src/utils/storage";
+import { ApiStatus } from "@/src/constants/apiStatus";
 
 const axiosInstance = axios.create({
     baseURL: "/",
@@ -26,7 +27,7 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     (error) => {
-        if (error.response?.status === 401) {
+        if (error.response?.status === ApiStatus.UNAUTHORIZED) {
             storage.removeCookie("token");
             window.location.href = "/";
         }

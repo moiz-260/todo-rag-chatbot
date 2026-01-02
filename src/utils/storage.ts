@@ -20,20 +20,12 @@ export const storage = {
     removeCookie: (key: string) => {
         Cookies.remove(key);
     },
-    setSession: (token: string, user: any) => {
+    setSession: (token: string) => {
         storage.setItem("token", token);
-        storage.setItem("user", user);
-        storage.setItem("email", user.email);
         storage.setCookie("token", token);
-        storage.setCookie("userId", user.id || user._id);
-        storage.setCookie("email", user.email);
     },
     clearSession: () => {
         storage.removeItem("token");
-        storage.removeItem("user");
-        storage.removeItem("email");
         storage.removeCookie("token");
-        storage.removeCookie("userId");
-        storage.removeCookie("email");
     }
 };

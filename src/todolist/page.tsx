@@ -36,7 +36,7 @@ const TodoList: React.FC = () => {
 
   return (
     <AuthLayout>
-      {/* Confirmation Modal */}
+
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         onConfirm={handleDelete}
@@ -45,7 +45,6 @@ const TodoList: React.FC = () => {
       />
 
 
-      {/* Todo Detail Modal */}
       <TodoDetailModal
         isOpen={detailModal.isOpen}
         todo={detailModal.todo}
@@ -95,7 +94,6 @@ const TodoList: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Todo Form */}
           <TodoForm
             title={title}
             description={description}
@@ -107,7 +105,6 @@ const TodoList: React.FC = () => {
             onCancel={handleCancel}
           />
 
-          {/* Todo List */}
           <div className="flex flex-col gap-4">
             {todos.length === 0 ? (
               <GlassCard>
