@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useStorage } from '@/src/hooks/useStorage';
 import { Todo, ConfirmModalState, DetailModalState } from '@/src/todolist/types';
 import toast from 'react-hot-toast';
 import { useTodoApi } from '@/src/hooks/useTodoApi';
@@ -12,8 +11,6 @@ export const useTodoManager = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const { fetchTodos: getTodos, createTodo, updateTodo, deleteTodo, loading: apiLoading } = useTodoApi();
     const { logout } = useAuth();
-    const { getCookie, getItem } = useStorage();
-    const [userId, setUserId] = useState<string>('');
     const [confirmModal, setConfirmModal] = useState<ConfirmModalState>({
         isOpen: false,
         todoId: null
@@ -22,41 +19,14 @@ export const useTodoManager = () => {
         isOpen: false,
         todo: null
     });
-    const [email, setEmail] = useState<string>('');
 
     useEffect(() => {
-        const userIdFromCookie = getCookie('userId');
-        const emailFromCookie = getCookie('email');
-
-        if (userIdFromCookie) {
-            setUserId(userIdFromCookie);
-        }
-
-        if (emailFromCookie) {
-            setEmail(emailFromCookie);
-        }
-
-        if (!userIdFromCookie || !emailFromCookie) {
-            const user = getItem('user');
-            if (user) {
-                const userData = JSON.parse(user);
-                if (!userIdFromCookie) setUserId(userData.id || userData._id || userData.email);
-                if (!emailFromCookie) setEmail(userData.email);
-            } else if (!userIdFromCookie && !emailFromCookie) {
-                window.location.href = '/';
-            }
-        }
-    }, [getCookie, getItem]);
-
-    useEffect(() => {
-        if (email) {
-            fetchTodos();
-        }
-    }, [email]);
+        fetchTodos();
+    }, []);
 
     const fetchTodos = async () => {
         try {
-            const data = await getTodos(email, userId);
+            const data = await getTodos();
             if (data) {
                 setTodos(data.todos);
             }
@@ -72,7 +42,6 @@ export const useTodoManager = () => {
         try {
             if (editingId) {
                 const data = await updateTodo(editingId, { title, description });
-
                 if (data) {
                     await fetchTodos();
                     setEditingId(null);
@@ -81,8 +50,7 @@ export const useTodoManager = () => {
                     toast.success('Todo updated successfully!');
                 }
             } else {
-                const data = await createTodo({ title, description, userId, email });
-
+                const data = await createTodo({ title, description });
                 if (data) {
                     await fetchTodos();
                     setTitle('');
@@ -114,7 +82,6 @@ export const useTodoManager = () => {
 
         try {
             const data = await deleteTodo(id);
-
             if (data) {
                 await fetchTodos();
                 toast.success('Todo deleted successfully!');
@@ -140,7 +107,6 @@ export const useTodoManager = () => {
     };
 
     return {
-        // State
         todos,
         title,
         description,
@@ -148,14 +114,10 @@ export const useTodoManager = () => {
         loading: apiLoading,
         confirmModal,
         detailModal,
-
-        // Setters
         setTitle,
         setDescription,
         setConfirmModal,
         setDetailModal,
-
-        // Functions
         handleSubmit,
         handleEdit,
         handleDeleteClick,

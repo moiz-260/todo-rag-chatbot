@@ -3,7 +3,7 @@ import dbConnect from '@/src/lib/mongodb';
 import Todo from '@/src/models/Todo';
 import mongoose from 'mongoose';
 import { ApiStatus } from '@/src/constants/apiStatus';
-// import { upsertTodoToPinecone, deleteTodoFromPinecone } from '@/src/lib/ai';
+import { verifyToken } from '@/src/lib/auth';
 
 export async function PUT(
     request: NextRequest,
@@ -11,6 +11,11 @@ export async function PUT(
 ) {
     try {
         await dbConnect();
+        const user = await verifyToken(request);
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized access' }, { status: ApiStatus.UNAUTHORIZED });
+        }
+
         const { id } = await params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -23,7 +28,6 @@ export async function PUT(
         const body = await request.json();
         const { title, description } = body;
 
-
         if (!title || !description) {
             return NextResponse.json(
                 { error: 'Title and description are required' },
@@ -31,39 +35,24 @@ export async function PUT(
             );
         }
 
-        const todo = await Todo.findByIdAndUpdate(
-            id,
+        const todo = await Todo.findOneAndUpdate(
+            { _id: id, userId: user.userId },
             { title, description },
             { new: true, runValidators: true }
         );
 
         if (!todo) {
             return NextResponse.json(
-                { error: 'Todo not found' },
+                { error: 'Todo not found or unauthorized' },
                 { status: ApiStatus.NOT_FOUND }
             );
         }
 
-        // Sync with Pinecone
-        // try {
-        //     await upsertTodoToPinecone({
-        //         id: todo._id.toString(),
-        //         title: todo.title,
-        //         description: todo.description,
-        //         userId: todo.userId,
-        //         email: todo.email,
-        //     });
-        // } catch (error) {
-        //     console.error('Failed to update Pinecone:', error);
-        // }
-
         return NextResponse.json({ todo }, { status: ApiStatus.SUCCESS });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Failed to update todo';
-        const stack = process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined;
-
         return NextResponse.json(
-            { error: message, stack },
+            { error: message },
             { status: ApiStatus.SERVER_ERROR }
         );
     }
@@ -75,6 +64,10 @@ export async function DELETE(
 ) {
     try {
         await dbConnect();
+        const user = await verifyToken(request);
+        if (!user) {
+            return NextResponse.json({ error: 'Unauthorized access' }, { status: ApiStatus.UNAUTHORIZED });
+        }
 
         const { id } = await params;
 
@@ -85,33 +78,23 @@ export async function DELETE(
             );
         }
 
-        const todo = await Todo.findByIdAndDelete(id);
+        const todo = await Todo.findOneAndDelete({ _id: id, userId: user.userId });
 
         if (!todo) {
             return NextResponse.json(
-                { error: 'Todo not found' },
+                { error: 'Todo not found or unauthorized' },
                 { status: ApiStatus.NOT_FOUND }
             );
         }
-
-        // Sync with Pinecone
-        // try {
-        //     await deleteTodoFromPinecone(id);
-        // } catch (error) {
-        //     console.error('Failed to delete from Pinecone:', error);
-        // }
 
         return NextResponse.json(
             { message: 'Todo deleted successfully', todo },
             { status: ApiStatus.SUCCESS }
         );
     } catch (error: unknown) {
-
         const message = error instanceof Error ? error.message : 'Failed to delete todo';
-        const stack = process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined;
-
         return NextResponse.json(
-            { error: message, stack },
+            { error: message },
             { status: ApiStatus.SERVER_ERROR }
         );
     }

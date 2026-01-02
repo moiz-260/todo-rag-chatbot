@@ -1,16 +1,15 @@
 import { useCallback } from "react";
-import { useApi } from "./useApi";
-import { Todo } from "../todolist/types";
+import { useApi } from "@/src/hooks/useApi";
+import { Todo } from "@/src/todolist/types";
 
-export const useTodoApi = () => {
+export function useTodoApi() {
     const { get, post, put, del, loading, error } = useApi();
 
-    const fetchTodos = useCallback(async (email?: string, userId?: string) => {
-        const query = email ? `email=${email}` : `userId=${userId}`;
-        return await get<{ todos: Todo[] }>(`/api/todos?${query}`);
+    const fetchTodos = useCallback(async () => {
+        return await get<{ todos: Todo[] }>("/api/todos");
     }, [get]);
 
-    const createTodo = useCallback(async (todoData: { title: string; description: string; userId: string; email: string }) => {
+    const createTodo = useCallback(async (todoData: { title: string; description: string }) => {
         return await post<any>("/api/todos", todoData);
     }, [post]);
 
@@ -30,4 +29,4 @@ export const useTodoApi = () => {
         loading,
         error,
     };
-};
+}
